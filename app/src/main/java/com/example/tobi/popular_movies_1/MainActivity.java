@@ -15,26 +15,30 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Context context;
     private GridAdapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    //private RecyclerView.LayoutManager layoutManager;
+    private GridLayoutManager layoutManager;
     private ApiModule apiModule;
+    private MovieView movieView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        init();
+        adapter = new GridAdapter();
         context = getApplicationContext();
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
 
         // 2 is the number of grid layout columns
-        layoutManager = new GridLayoutManager(context, 2);
+        layoutManager = new GridLayoutManager(MainActivity.this, 2);
+        recyclerView.setLayoutManager(layoutManager);
 
         // Do i need the context?
-        adapter = new GridAdapter(context);
-
         recyclerView.setAdapter(adapter);
+        movieView = new MovieView(adapter);
 
-        init();
 
         Call <MovieResponse> call = apiModule.movieApi().getPopularMovies();
 
@@ -42,11 +46,10 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onResponse(Call<MovieResponse> call,
                 Response<MovieResponse> response) {
                 MovieResponse movieResults = response.body();
-
-                for (int i = 0; i < 5; i++) {
-                    Log.d("name", movieResults.getResults().get(i).getTitle());
+                movieView.setMovieData(movieResults.getResults(), context);
+                for (int i = 0; i < movieResults.getResults().size(); i++) {
+                    Log.d("URL", "onResponse: " + movieResults.getResults().get(i).getPosterPath());
                 }
-
             }
 
             @Override public void onFailure(Call<MovieResponse> call, Throwable t) {
