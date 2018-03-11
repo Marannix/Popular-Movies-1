@@ -7,10 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.squareup.picasso.Picasso;
-import java.util.List;
 
 /**
  * Created by Tobi on 25-Feb-18.
@@ -39,7 +42,6 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
     //https://developers.themoviedb.org/3/configuration/get-api-configuration
     // example -> https://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg
 
-    // image not being passed, sucks to be me
     Picasso.with(context).load(path).into(holder.imageView);
     Log.d("URL", "onBindViewHolder: " + path);
   }
