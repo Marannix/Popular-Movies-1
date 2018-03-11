@@ -11,71 +11,92 @@ import com.google.gson.annotations.SerializedName;
 
 public class Movie implements Parcelable {
 
-  @SerializedName("vote_count") private int voteCount;
-  private int id;
-  private String title;
-  private float popularity;
-  @SerializedName("poster_path") private String posterPath;
+    private int id;
+    private String title;
+    private String overview;
+    @SerializedName("poster_path")
+    private String posterPath;
+    @SerializedName("vote_count")
+    private int voteCount;
+    @SerializedName("vote_average")
+    private float voteAverage;
+    @SerializedName("release_date")
+    private String releaseDate;
 
-  public Movie(int voteCount, int id, String title, float popularity, String posterPath) {
-    this.voteCount = voteCount;
-    this.id = id;
-    this.title = title;
-    this.popularity = popularity;
-    this.posterPath = posterPath;
-  }
+    public Movie(int id, String title, String overview, String posterPath, int voteCount,
+                 float voteAverage, String releaseDate) {
+        this.id = id;
+        this.title = title;
+        this.overview = overview;
+        this.posterPath = posterPath;
+        this.voteCount = voteCount;
+        this.voteAverage = voteAverage;
+        this.releaseDate = releaseDate;
+    }
 
-  public int getVoteCount() {
-    return voteCount;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public int getId() {
-    return id;
-  }
+    public String getTitle() {
+        return title;
+    }
 
-  public String getTitle() {
-    return title;
-  }
+    public String getOverview() {
+        return overview;
+    }
 
-  public float getPopularity() {
-    return popularity;
-  }
+    public String getPosterPath() {
+        return posterPath;
+    }
 
-  public String getPosterPath() {
-    return posterPath;
-  }
-  
-  @Override
-  public int describeContents() {
-    return 0;
-  }
+    public int getVoteCount() {
+        return voteCount;
+    }
 
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-    dest.writeInt(this.voteCount);
-    dest.writeInt(this.id);
-    dest.writeString(this.title);
-    dest.writeFloat(this.popularity);
-    dest.writeString(this.posterPath);
-  }
+    public float getVoteAverage() {
+        return voteAverage;
+    }
 
-  protected Movie(Parcel in) {
-    this.voteCount = in.readInt();
-    this.id = in.readInt();
-    this.title = in.readString();
-    this.popularity = in.readFloat();
-    this.posterPath = in.readString();
-  }
-
-  public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
-    @Override
-    public Movie createFromParcel(Parcel source) {
-      return new Movie(source);
+    public String getReleaseDate() {
+        return releaseDate;
     }
 
     @Override
-    public Movie[] newArray(int size) {
-      return new Movie[size];
+    public int describeContents() {
+        return 0;
     }
-  };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.overview);
+        dest.writeString(this.posterPath);
+        dest.writeInt(this.voteCount);
+        dest.writeFloat(this.voteAverage);
+        dest.writeString(this.releaseDate);
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readInt();
+        this.title = in.readString();
+        this.overview = in.readString();
+        this.posterPath = in.readString();
+        this.voteCount = in.readInt();
+        this.voteAverage = in.readFloat();
+        this.releaseDate = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

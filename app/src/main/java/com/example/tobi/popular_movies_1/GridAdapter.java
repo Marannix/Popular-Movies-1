@@ -1,6 +1,7 @@
 package com.example.tobi.popular_movies_1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,42 +21,59 @@ import butterknife.ButterKnife;
  */
 
 public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
-  private Context context;
-  private List<Movie> movies;
-  private String movieUrl = "https://image.tmdb.org/t/p/";
-  private String phoneSize = "w500";
+    private Context context;
+    private List<Movie> movies;
+    private String movieUrl = "https://image.tmdb.org/t/p/";
+    private String phoneSize = "w500";
 
-  public void setMovieData(List<Movie> movies, Context context) {
-    this.movies = movies;
-    this.context = context;
-    this.notifyDataSetChanged();
-  }
-
-  @Override public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    return new ViewHolder(
-        LayoutInflater.from(parent.getContext()).inflate(R.layout.single_item, parent, false));
-  }
-
-  @Override public void onBindViewHolder(ViewHolder holder, int position) {
-    final Movie movie = movies.get(position);
-    String path = movieUrl + phoneSize + movie.getPosterPath();
-    //https://developers.themoviedb.org/3/configuration/get-api-configuration
-    // example -> https://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg
-
-    Picasso.with(context).load(path).into(holder.imageView);
-    Log.d("URL", "onBindViewHolder: " + path);
-  }
-
-  @Override public int getItemCount() {
-    return movies != null ? movies.size() : 0;
-  }
-
-  public static class ViewHolder extends RecyclerView.ViewHolder {
-    @BindView(R.id.imageView) ImageView imageView;
-
-    public ViewHolder(View itemView) {
-      super(itemView);
-      ButterKnife.bind(this, itemView);
+    public void setMovieData(List<Movie> movies, Context context) {
+        this.movies = movies;
+        this.context = context;
+        this.notifyDataSetChanged();
     }
-  }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.single_item, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+        final Movie movie = movies.get(position);
+        final String path = movieUrl + phoneSize + movie.getPosterPath();
+        //https://developers.themoviedb.org/3/configuration/get-api-configuration
+        // example -> https://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg
+
+        Picasso.with(context).load(path).into(holder.imageView);
+        Log.d("URL", "onBindViewHolder: " + path);
+
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Movie dataToSend = new Movie(movie.getId(), movie.getTitle(), movie.getOverview(),
+                        movie.getPosterPath(), movie.getVoteCount(), movie.getVoteAverage(),
+                        movie.getReleaseDate());
+                Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra("myDataKey", dataToSend);
+                intent.putExtra("path", path);
+                context.startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return movies != null ? movies.size() : 0;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.imageView)
+        ImageView imageView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
 }

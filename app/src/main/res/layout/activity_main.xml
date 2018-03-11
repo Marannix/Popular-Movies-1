@@ -13,7 +13,6 @@
         tools:listitem = "@layout/single_item"
         app:layoutManager= "android.support.v7.widget.GridLayoutManager"
         app:spanCount="2"
-
         android:scrollbars="vertical">
     </android.support.v7.widget.RecyclerView>
 

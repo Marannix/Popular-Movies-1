@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("failed", t.getMessage());
             }
         });
+
     }
 
     private void init() {
