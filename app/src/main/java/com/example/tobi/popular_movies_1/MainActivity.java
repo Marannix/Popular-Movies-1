@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private GridLayoutManager layoutManager;
     private ApiModule apiModule;
     private MovieView movieView;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +42,25 @@ public class MainActivity extends AppCompatActivity {
         // Do i need the context?
         recyclerView.setAdapter(adapter);
         movieView = new MovieView(adapter);
+        
+    }
 
-        int position = 1;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
-        if (position == 1) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.popularMovies) {
+            retrievePopularMovies();
+        } else if (item.getItemId() == R.id.topRated) {
             retrieveTopRatedMovies();
         } else {
-            retrievePopularMovies();
+            return super.onOptionsItemSelected(item);
         }
-        
+        return true;
     }
 
     private void retrievePopularMovies() {
@@ -57,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         popularMovies.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call,
-                Response<MovieResponse> response) {
+                                   Response<MovieResponse> response) {
                 MovieResponse movieResults = response.body();
                 movieView.setMovieData(movieResults.getResults(), context);
                 for (int i = 0; i < movieResults.getResults().size(); i++) {
@@ -65,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            @Override public void onFailure(Call<MovieResponse> call, Throwable t) {
+            @Override
+            public void onFailure(Call<MovieResponse> call, Throwable t) {
                 Log.d("failed", "failed");
                 Log.d("failed", t.getMessage());
             }
