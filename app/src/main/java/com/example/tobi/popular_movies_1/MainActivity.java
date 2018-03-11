@@ -2,6 +2,7 @@ package com.example.tobi.popular_movies_1;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,10 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String BUNDLE_KEY_MENU_POPULAR_MOVIES = "menuPopularMovies";
+    private static final String BUNDLE_KEY_MENU_TOP_RATED_MOVIES = "menuTopRatedMovies";
+    private static final String BUNDLE_KEY_LAYOUT_MANAGER_STATE = "layoutManagerState";
+
     private RecyclerView recyclerView;
     private Context context;
     private GridAdapter adapter;
@@ -22,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
     private GridLayoutManager layoutManager;
     private ApiModule apiModule;
     private MovieView movieView;
-    private Menu menu;
+
+    private boolean shouldShowPopularMovies = true;
+    private boolean shouldShowTopRatedMovies;
+    private Parcelable layoutManagerInstanceState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +43,25 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
 
-        // 2 is the number of grid layout columns
         layoutManager = new GridLayoutManager(MainActivity.this, 2);
         recyclerView.setLayoutManager(layoutManager);
 
-        // Do i need the context?
         recyclerView.setAdapter(adapter);
         movieView = new MovieView(adapter);
-        
+
+        if (savedInstanceState != null) {
+            layoutManagerInstanceState = savedInstanceState.getParcelable(BUNDLE_KEY_LAYOUT_MANAGER_STATE);
+            shouldShowPopularMovies = savedInstanceState.getBoolean(BUNDLE_KEY_MENU_POPULAR_MOVIES);
+            shouldShowTopRatedMovies = savedInstanceState.getBoolean(BUNDLE_KEY_MENU_TOP_RATED_MOVIES);
+        }
+
+        if (shouldShowPopularMovies) {
+            retrievePopularMovies();
+        } else {
+            retrieveTopRatedMovies();
+        }
+
+
     }
 
     @Override
@@ -51,16 +70,29 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.popularMovies) {
+            if (item.isChecked()) {
+                return true;
+            }
+            item.setChecked(!item.isChecked());
             retrievePopularMovies();
+            shouldShowPopularMovies = true;
+            shouldShowTopRatedMovies = false;
+            return true;
         } else if (item.getItemId() == R.id.topRated) {
+            if (item.isChecked()) {
+                return true;
+            }
+            item.setChecked(!item.isChecked());
             retrieveTopRatedMovies();
-        } else {
-            return super.onOptionsItemSelected(item);
+            shouldShowPopularMovies = false;
+            shouldShowTopRatedMovies = true;
+            return true;
         }
-        return true;
+            return super.onOptionsItemSelected(item);
     }
 
     private void retrievePopularMovies() {
@@ -73,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
                                    Response<MovieResponse> response) {
                 MovieResponse movieResults = response.body();
                 movieView.setMovieData(movieResults.getResults(), context);
+                if (layoutManagerInstanceState != null) {
+                    layoutManager.onRestoreInstanceState(layoutManagerInstanceState);
+                    layoutManagerInstanceState = null;
+                }
                 for (int i = 0; i < movieResults.getResults().size(); i++) {
                     Log.d("URL", "onResponse: " + movieResults.getResults().get(i).getPosterPath());
                 }
@@ -109,5 +145,11 @@ public class MainActivity extends AppCompatActivity {
         apiModule = new ApiModule();
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(BUNDLE_KEY_LAYOUT_MANAGER_STATE, layoutManager.onSaveInstanceState());
+        outState.putBoolean(BUNDLE_KEY_MENU_POPULAR_MOVIES, shouldShowPopularMovies);
+        outState.putBoolean(BUNDLE_KEY_MENU_TOP_RATED_MOVIES, shouldShowTopRatedMovies);
+    }
 }
