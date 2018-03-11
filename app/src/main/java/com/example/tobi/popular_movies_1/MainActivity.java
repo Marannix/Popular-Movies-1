@@ -40,11 +40,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         movieView = new MovieView(adapter);
 
+        int position = 1;
 
-        Call <MovieResponse> call = apiModule.movieApi().getPopularMovies();
+        if (position == 1) {
+            retrieveTopRatedMovies();
+        } else {
+            retrievePopularMovies();
+        }
+        
+    }
 
-        call.enqueue(new Callback<MovieResponse>() {
-            @Override public void onResponse(Call<MovieResponse> call,
+    private void retrievePopularMovies() {
+        Call<MovieResponse> popularMovies = apiModule.movieApi().getPopularMovies();
+
+
+        popularMovies.enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(Call<MovieResponse> call,
                 Response<MovieResponse> response) {
                 MovieResponse movieResults = response.body();
                 movieView.setMovieData(movieResults.getResults(), context);
@@ -58,7 +70,25 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("failed", t.getMessage());
             }
         });
+    }
 
+    private void retrieveTopRatedMovies() {
+        Call<MovieResponse> topRated = apiModule.movieApi().getTopRatedMovies();
+        topRated.enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                MovieResponse movieResults = response.body();
+                movieView.setMovieData(movieResults.getResults(), context);
+                for (int i = 0; i < movieResults.getResults().size(); i++) {
+                    Log.d("URL", "onResponse: " + movieResults.getResults().get(i).getPosterPath());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     private void init() {
