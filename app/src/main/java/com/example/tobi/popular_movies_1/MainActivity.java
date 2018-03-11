@@ -6,9 +6,9 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Context context;
     private GridAdapter adapter;
-    //private RecyclerView.LayoutManager layoutManager;
     private GridLayoutManager layoutManager;
     private ApiModule apiModule;
     private MovieView movieView;
@@ -54,14 +53,15 @@ public class MainActivity extends AppCompatActivity {
             shouldShowPopularMovies = savedInstanceState.getBoolean(BUNDLE_KEY_MENU_POPULAR_MOVIES);
             shouldShowTopRatedMovies = savedInstanceState.getBoolean(BUNDLE_KEY_MENU_TOP_RATED_MOVIES);
         }
+        showMovies();
+    }
 
+    private void showMovies() {
         if (shouldShowPopularMovies) {
             retrievePopularMovies();
         } else {
             retrieveTopRatedMovies();
         }
-
-
     }
 
     @Override
@@ -74,50 +74,54 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.popularMovies) {
-            if (item.isChecked()) {
-                return true;
-            }
-            item.setChecked(!item.isChecked());
+            if (IsItemChecked(item)) return true;
             retrievePopularMovies();
             shouldShowPopularMovies = true;
             shouldShowTopRatedMovies = false;
             return true;
         } else if (item.getItemId() == R.id.topRated) {
-            if (item.isChecked()) {
-                return true;
-            }
-            item.setChecked(!item.isChecked());
+            if (IsItemChecked(item)) return true;
             retrieveTopRatedMovies();
             shouldShowPopularMovies = false;
             shouldShowTopRatedMovies = true;
             return true;
         }
-            return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean IsItemChecked(MenuItem item) {
+        if (item.isChecked()) {
+            return true;
+        }
+        item.setChecked(!item.isChecked());
+        return false;
     }
 
     private void retrievePopularMovies() {
         Call<MovieResponse> popularMovies = apiModule.movieApi().getPopularMovies();
-
-
         popularMovies.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call,
                                    Response<MovieResponse> response) {
-                MovieResponse movieResults = response.body();
-                movieView.setMovieData(movieResults.getResults(), context);
+                if (response.isSuccessful()) {
+                    MovieResponse movieResults = response.body();
+                    movieView.setMovieData(movieResults.getResults(), context);
+                } else {
+                    Toast.makeText(context, "Unable to show Popular Movies", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Please provide an Api Key, Thank you", Toast.LENGTH_SHORT).show();
+
+                }
+
                 if (layoutManagerInstanceState != null) {
                     layoutManager.onRestoreInstanceState(layoutManagerInstanceState);
                     layoutManagerInstanceState = null;
-                }
-                for (int i = 0; i < movieResults.getResults().size(); i++) {
-                    Log.d("URL", "onResponse: " + movieResults.getResults().get(i).getPosterPath());
                 }
             }
 
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
-                Log.d("failed", "failed");
-                Log.d("failed", t.getMessage());
+                Toast.makeText(context, "Unable to retrieve Popular Movies", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Please check your connection", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -127,16 +131,26 @@ public class MainActivity extends AppCompatActivity {
         topRated.enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-                MovieResponse movieResults = response.body();
-                movieView.setMovieData(movieResults.getResults(), context);
-                for (int i = 0; i < movieResults.getResults().size(); i++) {
-                    Log.d("URL", "onResponse: " + movieResults.getResults().get(i).getPosterPath());
+
+                if (response.isSuccessful()) {
+                    MovieResponse movieResults = response.body();
+                    movieView.setMovieData(movieResults.getResults(), context);
+                } else {
+                    Toast.makeText(context, "Unable to show Top Rated Movies", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Please provide an Api Key, Thank you", Toast.LENGTH_SHORT).show();
+                }
+
+                if (layoutManagerInstanceState != null) {
+                    layoutManager.onRestoreInstanceState(layoutManagerInstanceState);
+                    layoutManagerInstanceState = null;
                 }
             }
 
+
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
-
+                Toast.makeText(context, "Unable to retrieve Top Rated Movies", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Please check your connection", Toast.LENGTH_SHORT).show();
             }
         });
     }

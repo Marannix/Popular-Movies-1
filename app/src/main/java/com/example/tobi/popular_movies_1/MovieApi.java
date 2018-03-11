@@ -9,13 +9,12 @@ import retrofit2.http.GET;
 
 public interface MovieApi {
 
+  //Insert your Api Key or crash
   String apiKey = "";
 
   String authentication = "api_key=" + apiKey;
-  // popular movies
-  @GET("movie/popular?" + authentication) Call<MovieResponse> getPopularMovies();
 
-  // top rated movies -> this is most likely the wrong response
-  //@GET("movie/top_rated" + apiKey) Call<List<MovieResponse>> topRatedMovies();
+  @GET("movie/popular?" + authentication) Call<MovieResponse> getPopularMovies();
+  @GET("movie/top_rated?" + authentication) Call<MovieResponse> getTopRatedMovies();
 
 }

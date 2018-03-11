@@ -3,7 +3,6 @@ package com.example.tobi.popular_movies_1;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,11 +41,8 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Movie movie = movies.get(position);
         final String path = movieUrl + phoneSize + movie.getPosterPath();
-        //https://developers.themoviedb.org/3/configuration/get-api-configuration
-        // example -> https://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg
 
         Picasso.with(context).load(path).into(holder.imageView);
-        Log.d("URL", "onBindViewHolder: " + path);
 
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -10,7 +10,7 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem = "@layout/single_item"
+        tools:listitem ="@layout/single_item"
         app:layoutManager= "android.support.v7.widget.GridLayoutManager"
         app:spanCount="2"
         android:scrollbars="vertical">
